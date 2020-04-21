@@ -1,12 +1,3 @@
-<p align="center">
-    <h3 align="center">XEyes-CONF</h3>
-    <p align="center">
-        XEyes-CONF, A lightweight distributed configuration management platform.
-        <br>
-        <a href="https://www.xeyes.io/blogs/"><strong>-- Home Page --</strong></a>
-        <br>
-    </p>    
-</p>
 
 ## Introduction
 XEyes-CONF is a lightweight distributed configuration management platform, 
@@ -45,7 +36,7 @@ XEyes-CONF 是一个轻量级分布式配置管理平台，拥有"轻量级、�
 
 ## Development
 
-欢迎大家的关注和使用，XEyes-CONF也将拥抱变化，持续发展。
+欢迎大家的关注和使用，拥抱变化，持续发展。
 
 
 ## Contributing
@@ -58,7 +49,5 @@ Contributions are welcome! Open a pull request to fix a bug, or open an [Issue](
 This product is open source and free, and will continue to provide free community technical support. Individual or enterprise users are free to access and use.
 
 - Licensed under the GNU General Public License (GPL) v3.
-- Copyright (c) 2015-present.
 
-产品开源免费，并且将持续提供免费的社区技术支持。个人或企业内部可自由的接入和使用。
 
