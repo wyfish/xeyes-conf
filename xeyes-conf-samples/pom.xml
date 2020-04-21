@@ -6,7 +6,7 @@
 		<artifactId>conf</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>xxl-conf-samples</artifactId>
+	<artifactId>xeyes-conf-samples</artifactId>
 	<packaging>pom</packaging>
 
 	<modules>
