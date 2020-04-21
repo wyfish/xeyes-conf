@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.xeyes</groupId>
-        <artifactId>conf</artifactId>
+        <artifactId>xeyes-conf-samples</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>xeyes-conf-sample-frameless</artifactId>
