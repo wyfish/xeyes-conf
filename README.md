@@ -1,12 +1,3 @@
-<p align="center">
-    <h3 align="center">XEyes-CONF</h3>
-    <p align="center">
-        XEyes-CONF, A lightweight distributed configuration management platform.
-        <br>
-        <a href="https://www.xeyes.io/blogs/"><strong>-- Home Page --</strong></a>
-        <br>
-    </p>    
-</p>
 
 ## Introduction
 XEyes-CONF is a lightweight distributed configuration management platform, 
