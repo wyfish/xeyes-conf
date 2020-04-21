@@ -28,13 +28,13 @@
 		<!-- Main content -->
 		<section class="content">
 			<div class="callout callout-info">
-				<h4>简介：分布式配置管理平台XXL-CONF</h4>
+				<h4>简介：分布式配置管理平台XEyes-CONF</h4>
 				<br>
 				<p>
-                    <a target="_blank" href="https://github.com/xuxueli/xxl-conf">Github</a>&nbsp;&nbsp;&nbsp;&nbsp;
-					<iframe src="https://ghbtns.com/github-btn.html?user=xuxueli&repo=xxl-conf&type=star&count=true" frameborder="0" scrolling="0" width="170px" height="20px" style="margin-bottom:-5px;"></iframe>
+                    <a target="_blank" href="https://github.com/wyfish/xeyes-conf">Github</a>&nbsp;&nbsp;&nbsp;&nbsp;
+					<iframe src="https://ghbtns.com/github-btn.html?user=wyfish&repo=xeyes-conf&type=star&count=true" frameborder="0" scrolling="0" width="170px" height="20px" style="margin-bottom:-5px;"></iframe>
 					<br><br>
-					<a target="_blank" href="http://www.xuxueli.com/xxl-conf/">官方文档</a>
+					<a target="_blank" href="http://www.xeyes.io/">网站地址</a>
                     <br><br>
 
 				</p>
