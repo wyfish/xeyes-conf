@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.xeyes.conf.admin.dao.XEyesConfEnvDao">
+	
+	<resultMap id="xeyesConfEnv" type="io.xeyes.conf.admin.core.model.XEyesConfEnv" >
+		<result column="env" property="env" jdbcType="VARCHAR" />
+		<result column="title" property="title" jdbcType="VARCHAR" />
+		<result column="order" property="order" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		t.`env`,
+		t.`title`,
+		t.`order`
+	</sql>
+
+	<select id="findAll" parameterType="java.util.Map" resultMap="xeyesConfEnv">
+		SELECT <include refid="Base_Column_List" />
+		FROM xeyes_conf_env AS t
+		ORDER BY t.`order` ASC
+	</select>
+
+	<insert id="save" parameterType="io.xeyes.conf.admin.core.model.XEyesConfProject" >
+		INSERT INTO xeyes_conf_env(env, title, `order`)
+		VALUES(#{env}, #{title}, #{order})
+	</insert>
+
+	<update id="update" parameterType="io.xeyes.conf.admin.core.model.XEyesConfProject" >
+		UPDATE xeyes_conf_env
+		SET title = #{title},
+			`order` = #{order}
+		WHERE env = #{env}
+	</update>
+
+	<delete id="delete" parameterType="java.lang.String" >
+		DELETE FROM xeyes_conf_env
+		WHERE env = #{env}
+	</delete>
+
+	<select id="load" parameterType="java.lang.String" resultMap="xeyesConfEnv">
+		SELECT <include refid="Base_Column_List" />
+		FROM xeyes_conf_env AS t
+		WHERE env = #{env}
+	</select>
+
+</mapper>

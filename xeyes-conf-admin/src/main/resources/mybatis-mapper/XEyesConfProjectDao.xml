@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.xeyes.conf.admin.dao.XEyesConfProjectDao">
+	
+	<resultMap id="xeyesConfProject" type="io.xeyes.conf.admin.core.model.XEyesConfProject" >
+		<result column="appname" property="appname" jdbcType="VARCHAR" />
+		<result column="title" property="title" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		t.`appname`,
+		t.`title`
+	</sql>
+
+	<select id="findAll" parameterType="java.util.Map" resultMap="xeyesConfProject">
+		SELECT <include refid="Base_Column_List" />
+		FROM xeyes_conf_project AS t
+		ORDER BY t.appname
+	</select>
+
+	<insert id="save" parameterType="io.xeyes.conf.admin.core.model.XEyesConfProject" >
+		INSERT INTO xeyes_conf_project(appname, title)
+		VALUES(#{appname}, #{title})
+	</insert>
+
+	<update id="update" parameterType="io.xeyes.conf.admin.core.model.XEyesConfProject" >
+		UPDATE xeyes_conf_project
+		SET title = #{title}
+		WHERE appname = #{appname}
+	</update>
+
+	<delete id="delete" parameterType="java.lang.String" >
+		DELETE FROM xeyes_conf_project
+		WHERE appname = #{appname}
+	</delete>
+
+	<select id="load" parameterType="java.lang.String" resultMap="xeyesConfProject">
+		SELECT <include refid="Base_Column_List" />
+		FROM xeyes_conf_project AS t
+		WHERE appname = #{appname}
+	</select>
+
+</mapper>

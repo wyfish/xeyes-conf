@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.xeyes.conf.admin.dao.XEyesConfUserDao">
+	
+	<resultMap id="xeyesConfUser" type="io.xeyes.conf.admin.core.model.XEyesConfUser" >
+		<result column="username" property="username" />
+		<result column="password" property="password" />
+	    <result column="permission" property="permission" />
+		<result column="permission_data" property="permissionData" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		t.`username`,
+		t.`password`,
+		t.`permission`,
+		t.`permission_data`
+	</sql>
+
+	<select id="pageList" parameterType="java.util.Map" resultMap="xeyesConfUser">
+		SELECT <include refid="Base_Column_List" />
+		FROM xeyes_conf_user AS t
+		<trim prefix="WHERE" prefixOverrides="AND | OR" >
+			<if test="username != null and username != '' ">
+				AND t.username like CONCAT('%',#{username},'%')
+			</if>
+			<if test="permission gt -1">
+				t.permission = #{permission}
+			</if>
+		</trim>
+		ORDER BY t.username
+		LIMIT #{offset}, #{pagesize}
+	</select>
+
+	<select id="pageListCount" parameterType="java.util.Map" resultType="int">
+		SELECT count(1)
+		FROM xeyes_conf_user AS t
+		<trim prefix="WHERE" prefixOverrides="AND | OR" >
+			<if test="username != null and username != '' ">
+				AND t.username like CONCAT('%',#{username},'%')
+			</if>
+			<if test="permission gt -1">
+				t.permission = #{permission}
+			</if>
+		</trim>
+	</select>
+
+	<insert id="add" parameterType="io.xeyes.conf.admin.core.model.XEyesConfUser" >
+		INSERT INTO xeyes_conf_user(
+			`username`,
+			`password`,
+			`permission`,
+			`permission_data`
+		)
+		VALUES(
+			#{username},
+			#{password},
+			#{permission},
+			#{permissionData}
+		)
+	</insert>
+
+	<update id="update" parameterType="io.xeyes.conf.admin.core.model.XEyesConfUser" >
+		UPDATE xeyes_conf_user
+		SET `password` = #{password},
+			`permission` = #{permission},
+			`permission_data` = #{permissionData}
+		WHERE `username` = #{username}
+	</update>
+
+	<delete id="delete" parameterType="java.util.Map" >
+		DELETE FROM xeyes_conf_user
+		WHERE `username` = #{username}
+	</delete>
+
+	<select id="load" parameterType="java.lang.String" resultMap="xeyesConfUser">
+		SELECT <include refid="Base_Column_List" />
+		FROM xeyes_conf_user AS t
+		WHERE `username` = #{username}
+	</select>
+
+</mapper>

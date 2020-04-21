@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.xeyes.conf.admin.dao.XEyesConfNodeLogDao">
+	
+	<resultMap id="xeyesConfNodeLog" type="io.xeyes.conf.admin.core.model.XEyesConfNodeLog" >
+		<result column="env" property="env" />
+		<result column="key" property="key" />
+		<result column="title" property="title" />
+	    <result column="value" property="value" />
+	    <result column="addtime" property="addtime" />
+		<result column="optuser" property="optuser" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		t.`env`,
+		t.`key`,
+		t.`title`,
+		t.`value`,
+		t.`addtime`,
+		t.`optuser`
+	</sql>
+
+	<select id="findByKey" parameterType="java.util.Map" resultMap="xxlConfNodeLog">
+		SELECT <include refid="Base_Column_List" />
+		FROM xeyes_conf_node_log AS t
+		WHERE t.env = #{env} AND t.key = #{key}
+		ORDER BY t.addtime DESC
+	</select>
+
+	<insert id="add" parameterType="io.xeyes.conf.admin.core.model.XEyesConfNodeLog" >
+		INSERT INTO xeyes_conf_node_log(
+			`env`,
+			`key`,
+			`title`,
+			`value`,
+			`addtime`,
+			`optuser`
+		)
+		VALUES(
+			#{env},
+			#{key},
+			#{title},
+			#{value},
+			NOW(),
+			#{optuser}
+		)
+	</insert>
+
+	<delete id="deleteTimeout" parameterType="java.util.Map" >
+		DELETE FROM xeyes_conf_node_log
+		WHERE `env` = #{env}
+			AND `key` = #{key}
+			AND addtime NOT IN (
+				SELECT addtime FROM(
+					SELECT addtime FROM xeyes_conf_node_log
+					WHERE `env` = #{env}
+						AND `key` = #{key}
+					ORDER BY addtime DESC LIMIT #{length}
+				) t1
+			)
+	</delete>
+	
+	
+</mapper>
