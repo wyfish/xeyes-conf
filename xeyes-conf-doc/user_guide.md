@@ -1,4 +1,4 @@
-## 《分布式配置管理平台 XEyes-Conf》使用手册
+## 《分布式配置管理平台 XEyes-CONF》使用手册
 
 ## 一、简介
 
@@ -129,7 +129,7 @@ spring.datasource.url=jdbc:mysql://127.0.0.1:3306/xeyes-conf?Unicode=true&charac
 # 配置中心配置数据磁盘路径地址，务必对该路径存在读写权限
 xeyes.conf.confdata.filepath=/data/applogs/xeyes-conf/confdata
 
-# 配置中心接入验证TOKEN，选填，非空时启用，进行安全严重
+# 配置中心接入验证TOKEN，选填，非空时启用，进行安全验证
 xeyes.conf.access.token=
 ```
 
