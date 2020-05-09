@@ -1,7 +1,7 @@
 
 ## Introduction
 XEyes-CONF is a lightweight distributed configuration management platform with "lightweight, dynamic push, multi-environment, cross-language, cross-room, configuration monitoring, permission control, version rollback" and other features, which can be used right out of the box.
-
+（学习参考使用，商用级使用建议参考商业开源软件）
 
 ## Features
 - Lightweight: simple to deploy and not dependent on third-party services.
