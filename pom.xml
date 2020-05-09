@@ -14,7 +14,6 @@
 		<module>xeyes-conf-core</module>
 		<module>xeyes-conf-admin</module>
 		<module>xeyes-conf-samples</module>
-		<module>xeyes-conf-sql</module>
 	</modules>
 
 	<properties>

@@ -16,11 +16,11 @@ public class FrameLessXEyesConfConfig {
     public static void init() {
         Properties prop = PropUtil.loadProp("xeyes-conf.properties");
 
-        XxlConfBaseFactory.init(
-                prop.getProperty("xxl.conf.admin.address"),
-                prop.getProperty("xxl.conf.env"),
-                prop.getProperty("xxl.conf.access.token"),
-                prop.getProperty("xxl.conf.mirrorfile"));
+        XEyesConfBaseFactory.init(
+                prop.getProperty("xeyes.conf.admin.address"),
+                prop.getProperty("xeyes.conf.env"),
+                prop.getProperty("xeyes.conf.access.token"),
+                prop.getProperty("xeyes.conf.mirrorfile"));
     }
 
     /**
