@@ -143,20 +143,20 @@ java -jar xeyes-conf-admin.jar --spring.datasource.url=jdbc:mysql://127.0.0.1:33
 - 下载镜像
 
 ```
-// Docker地址：https://hub.docker.com/r/wyfish/xeyes-conf-admin/
-docker pull wyfish/xeyes-conf-admin
+// Docker地址：https://hub.docker.com/r/xeyes/xeyes-conf/
+docker pull xeyes/xeyes-conf
 ```
 
 - 创建容器并运行
 
 ```
-docker run -p 8080:8080 -v /tmp:/data/applogs --name xeyes-conf-admin  -d wyfish/xeyes-conf-admin
+docker run -p 8080:8080 -v /tmp:/data/applogs --name xeyes-conf -d xeyes/xeyes-conf
 
 /**
 * 如需自定义 mysql 等配置，可通过 "PARAMS" 指定，参数格式 RAMS="--key=value  --key2=value2" ；
 * 配置项参考文件：/xeyes-conf/xeyes-conf-admin/src/main/resources/application.properties
 */
-docker run -e PARAMS="--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/xeyes-conf?Unicode=true&characterEncoding=UTF-8 " -p 8080:8080 -v /tmp:/data/applogs --name xeyes-conf-admin  -d wyfish/xeyes-conf-admin
+docker run -e PARAMS="--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/xeyes-conf?Unicode=true&characterEncoding=UTF-8 " -p 8080:8080 -v /tmp:/data/applogs --name xeyes-conf  -d xeyes/xeyes-conf
 ```
 
 #### "配置中心" 集群：
@@ -174,7 +174,7 @@ docker run -e PARAMS="--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/xeyes-
 ```
 <!-- xeyes-conf-client -->
 <dependency>
-    <groupId>com.wyfish</groupId>
+    <groupId>io.xeyes</groupId>
     <artifactId>xeyes-conf-core</artifactId>
     <version>{最新稳定版}</version>
 </dependency>
