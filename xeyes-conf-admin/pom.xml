@@ -65,7 +65,7 @@
 			<version>${commons-lang3.version}</version>
 		</dependency>
 
-		<!-- xxl-conf-core -->
+		<!-- xeyes-conf-core -->
 		<dependency>
 			<groupId>io.xeyes</groupId>
 			<artifactId>xeyes-conf-core</artifactId>
@@ -105,9 +105,8 @@
 			<plugin>
 				<groupId>com.spotify</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.4.13</version>
+				<version>1.0.0</version>
 				<configuration>
-					<!-- made of '[a-z0-9-_.]' -->
 					<imageName>${project.artifactId}:${project.version}</imageName>
 					<dockerDirectory>${project.basedir}</dockerDirectory>
 					<resources>

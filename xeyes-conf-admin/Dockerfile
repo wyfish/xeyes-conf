@@ -1,4 +1,4 @@
-FROM openjdk:8-jre-slim
+FROM java:8
 MAINTAINER wyfish
 
 ENV PARAMS=""
