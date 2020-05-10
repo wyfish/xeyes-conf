@@ -57,9 +57,9 @@
 
 	<scm>
 		<tag>master</tag>
-		<url>https://github.com/xuxueli/xxl-conf.git</url>
-		<connection>scm:git:https://github.com/xuxueli/xxl-conf.git</connection>
-		<developerConnection>scm:git:git@github.com:xuxueli/xxl-conf.git</developerConnection>
+		<url>https://github.com/wyfish/xeyes-conf.git</url>
+		<connection>scm:git:https://github.com/wyfish/xeyes-conf.git</connection>
+		<developerConnection>scm:git:git@github.com:wyfish/xeyes-conf.git</developerConnection>
 	</scm>
 
 	<profiles>
