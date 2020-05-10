@@ -2,6 +2,7 @@ package io.xeyes.conf.admin.core.util;
 
 /**
  *
+ * @author Netfish
  */
 public class ReturnT<T> {
 

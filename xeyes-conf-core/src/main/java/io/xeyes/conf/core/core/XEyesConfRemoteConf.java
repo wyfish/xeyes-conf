@@ -7,10 +7,18 @@ import io.xeyes.conf.core.util.json.BasicJson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 
 /**
  * XEyes 配置中心的远端配置
+ * @author Netfish
  */
 public class XEyesConfRemoteConf {
     private static Logger logger = LoggerFactory.getLogger(XEyesConfRemoteConf.class);
@@ -63,9 +71,9 @@ public class XEyesConfRemoteConf {
 
         // parse obj
         Map<String, Object> respObj = BasicJson.parseMap(respJson);
-        int code = Integer.valueOf(String.valueOf(respObj.get("code")));
+        int code = Integer.parseInt(String.valueOf(respObj.get("code")));
         if (code != 200) {
-            logger.info("request fail, msg={}", (respObj.containsKey("msg")?respObj.get("msg"):respJson) );
+            logger.info("request fail, msg={}", (respObj.getOrDefault("msg", respJson)) );
             return null;
         }
         return respObj;
@@ -96,8 +104,7 @@ public class XEyesConfRemoteConf {
 
             // parse
             if (respObj!=null && respObj.containsKey("data")) {
-                Map<String, String> data = (Map<String, String>) respObj.get("data");
-                return data;
+                return (Map<String, String>) respObj.get("data");
             }
         }
 
@@ -110,7 +117,7 @@ public class XEyesConfRemoteConf {
      * @return
      */
     public static String find(String key) {
-        Map<String, String> result = find(new HashSet<String>(Arrays.asList(key)));
+        Map<String, String> result = find(new HashSet<String>(Collections.singletonList(key)));
         if (result!=null) {
             return result.get(key);
         }
@@ -120,7 +127,6 @@ public class XEyesConfRemoteConf {
 
     /**
      * 监控配置是否发生变化
-     *
      * @param keys
      * @return
      */
@@ -141,7 +147,7 @@ public class XEyesConfRemoteConf {
             // get and valid
             Map<String, Object> respObj = getAndValid(url, paramsJson, 60);
 
-            return respObj!=null?true:false;
+            return respObj != null;
         }
         return false;
     }

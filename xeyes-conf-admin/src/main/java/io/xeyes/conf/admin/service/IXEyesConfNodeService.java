@@ -11,11 +11,29 @@ import java.util.Map;
 
 /**
  *
+ * @author Netfish
  */
 public interface IXEyesConfNodeService {
 
+	/**
+	 *
+	 * @param loginUser
+	 * @param loginEnv
+	 * @param appName
+	 * @return
+	 */
 	public boolean ifHasProjectPermission(XEyesConfUser loginUser, String loginEnv, String appName);
 
+	/**
+	 *
+	 * @param offset
+	 * @param pageSize
+	 * @param appName
+	 * @param key
+	 * @param loginUser
+	 * @param loginEnv
+	 * @return
+	 */
 	public Map<String,Object> pageList(int offset,
 									   int pageSize,
 									   String appName,
@@ -23,19 +41,49 @@ public interface IXEyesConfNodeService {
 									   XEyesConfUser loginUser,
 									   String loginEnv);
 
+	/**
+	 *
+	 * @param key
+	 * @param loginUser
+	 * @param loginEnv
+	 * @return
+	 */
 	public ReturnT<String> delete(String key, XEyesConfUser loginUser, String loginEnv);
 
-	public ReturnT<String> add(XEyesConfNode XEyesConfNode, XEyesConfUser loginUser, String loginEnv);
+	/**
+	 *
+	 * @param xEyesConfNode
+	 * @param loginUser
+	 * @param loginEnv
+	 * @return
+	 */
+	public ReturnT<String> add(XEyesConfNode xEyesConfNode, XEyesConfUser loginUser, String loginEnv);
 
-	public ReturnT<String> update(XEyesConfNode XEyesConfNode, XEyesConfUser loginUser, String loginEnv);
+	/**
+	 *
+	 * @param xEyesConfNode
+	 * @param loginUser
+	 * @param loginEnv
+	 * @return
+	 */
+	public ReturnT<String> update(XEyesConfNode xEyesConfNode, XEyesConfUser loginUser, String loginEnv);
 
-    /*ReturnT<String> syncConf(String appname, XxlConfUser loginUser, String loginEnv);*/
-
-
-    // ---------------------- rest api ----------------------
-
+	/**
+	 *
+	 * @param accessToken
+	 * @param env
+	 * @param keys
+	 * @return
+	 */
     public ReturnT<Map<String, String>> find(String accessToken, String env, List<String> keys);
 
+	/**
+	 *
+	 * @param accessToken
+	 * @param env
+	 * @param keys
+	 * @return
+	 */
     public DeferredResult<ReturnT<String>> monitor(String accessToken, String env, List<String> keys);
 
 }

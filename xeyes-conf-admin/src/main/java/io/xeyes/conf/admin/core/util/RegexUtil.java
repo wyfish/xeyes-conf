@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 /**
  * regex tool
  *
+ * @author Netfish
  */
 public class RegexUtil {
 

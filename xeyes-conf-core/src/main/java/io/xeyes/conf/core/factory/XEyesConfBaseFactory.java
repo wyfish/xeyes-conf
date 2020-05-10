@@ -14,18 +14,22 @@ public class XEyesConfBaseFactory {
 
 
 	/**
-	 * init
+	 * 配置中心基类工厂的初始化方法
 	 *
 	 * @param adminAddress
 	 * @param env
 	 */
 	public static void init(String adminAddress, String env, String accessToken, String mirrorFile) {
 		// init
-		XEyesConfRemoteConf.init(adminAddress, env, accessToken);	// init remote util
-		XEyesConfMirrorConf.init(mirrorFile);			// init mirror util
-		XEyesConfLocalCacheConf.init();				// init cache + thread, cycle refresh + monitor
+		// init remote util
+		XEyesConfRemoteConf.init(adminAddress, env, accessToken);
+		// init mirror util
+		XEyesConfMirrorConf.init(mirrorFile);
+		// init cache + thread, cycle refresh + monitor
+		XEyesConfLocalCacheConf.init();
 
-		XEyesConfListenerFactory.addListener(null, new BeanRefreshXEyesConfListener());    // listener all key change
+		// listener all key change
+		XEyesConfListenerFactory.addListener(null, new BeanRefreshXEyesConfListener());
 
 	}
 
@@ -33,7 +37,7 @@ public class XEyesConfBaseFactory {
 	 * destory
 	 */
 	public static void destroy() {
-		XEyesConfLocalCacheConf.destroy();	// destroy
+		XEyesConfLocalCacheConf.destroy();
 	}
 
 }

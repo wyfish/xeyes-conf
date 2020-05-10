@@ -26,12 +26,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -47,34 +49,35 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 
 
 	@Resource
-	private XEyesConfNodeDao XEyesConfNodeDao;
-	@Resource
-	private XEyesConfProjectDao XEyesConfProjectDao;
-	@Resource
-	private XEyesConfNodeLogDao XEyesConfNodeLogDao;
-	@Resource
-	private XEyesConfEnvDao XEyesConfEnvDao;
-	@Resource
-	private XEyesConfNodeMsgDao XEyesConfNodeMsgDao;
+	private XEyesConfNodeDao xEyesConfNodeDao;
 
+	@Resource
+	private XEyesConfProjectDao xEyesConfProjectDao;
 
-	@Value("${xxl.conf.confdata.filepath}")
+	@Resource
+	private XEyesConfNodeLogDao xEyesConfNodeLogDao;
+
+	@Resource
+	private XEyesConfEnvDao xEyesConfEnvDao;
+
+	@Resource
+	private XEyesConfNodeMsgDao xEyesConfNodeMsgDao;
+
+	@Value("${xeyes.conf.confdata.filepath}")
 	private String confDataFilePath;
-	@Value("${xxl.conf.access.token}")
+
+	@Value("${xeyes.conf.access.token}")
 	private String accessToken;
 
 	private int confBeatTime = 30;
 
 
 	@Override
-	public boolean ifHasProjectPermission(XEyesConfUser loginUser, String loginEnv, String appName){
+	public boolean ifHasProjectPermission(@NotNull XEyesConfUser loginUser, String loginEnv, String appName){
 		if (loginUser.getPermission() == 1) {
 			return true;
 		}
-		if (ArrayUtils.contains(StringUtils.split(loginUser.getPermissionData(), ","), (appName.concat("#").concat(loginEnv)) )) {
-			return true;
-		}
-		return false;
+		return ArrayUtils.contains(StringUtils.split(loginUser.getPermissionData(), ","), (appName.concat("#").concat(loginEnv)));
 	}
 
 	@Override
@@ -96,14 +99,16 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 		}
 
 		// xxlConfNode in mysql
-		List<XEyesConfNode> data = XEyesConfNodeDao.pageList(offset, pageSize, loginEnv, appName, key);
-		int list_count = XEyesConfNodeDao.pageListCount(offset, pageSize, loginEnv, appName, key);
+		List<XEyesConfNode> data = xEyesConfNodeDao.pageList(offset, pageSize, loginEnv, appName, key);
+		int listCount = xEyesConfNodeDao.pageListCount(offset, pageSize, loginEnv, appName, key);
 
 		// package result
 		Map<String, Object> maps = new HashMap<String, Object>();
 		maps.put("data", data);
-		maps.put("recordsTotal", list_count);		// 总记录数
-		maps.put("recordsFiltered", list_count);	// 过滤后的总记录数
+		// 总记录数
+		maps.put("recordsTotal", listCount);
+		// 过滤后的总记录数
+		maps.put("recordsFiltered", listCount);
 		return maps;
 
 	}
@@ -113,7 +118,7 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 		if (StringUtils.isBlank(key)) {
 			return new ReturnT<String>(500, "参数缺失");
 		}
-		XEyesConfNode existNode = XEyesConfNodeDao.load(loginEnv, key);
+		XEyesConfNode existNode = xEyesConfNodeDao.load(loginEnv, key);
 		if (existNode == null) {
 			return new ReturnT<String>(500, "参数非法");
 		}
@@ -123,16 +128,20 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 			return new ReturnT<String>(500, "您没有该项目的配置权限,请联系管理员开通");
 		}
 
-		XEyesConfNodeDao.delete(loginEnv, key);
-		XEyesConfNodeLogDao.deleteTimeout(loginEnv, key, 0);
+		xEyesConfNodeDao.delete(loginEnv, key);
+		xEyesConfNodeLogDao.deleteTimeout(loginEnv, key, 0);
 
 		// conf msg
 		sendConfMsg(loginEnv, key, null);
-
 		return ReturnT.SUCCESS;
 	}
 
-	// conf broadcast msg
+	/**
+	 * conf broadcast msg
+	 * @param env
+	 * @param key
+	 * @param value
+	 */
 	private void sendConfMsg(String env, String key, String value){
 
 		XEyesConfNodeMsg confNodeMsg = new XEyesConfNodeMsg();
@@ -140,88 +149,87 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 		confNodeMsg.setKey(key);
 		confNodeMsg.setValue(value);
 
-		XEyesConfNodeMsgDao.add(confNodeMsg);
+		xEyesConfNodeMsgDao.add(confNodeMsg);
 	}
 
 	@Override
-	public ReturnT<String> add(XEyesConfNode XEyesConfNode, XEyesConfUser loginUser, String loginEnv) {
+	public ReturnT<String> add(@NotNull XEyesConfNode xEyesConfNode, XEyesConfUser loginUser, String loginEnv) {
 
 		// valid
-		if (StringUtils.isBlank(XEyesConfNode.getAppname())) {
+		if (StringUtils.isBlank(xEyesConfNode.getAppname())) {
 			return new ReturnT<String>(500, "AppName不可为空");
 		}
 
 		// project permission
-		if (!ifHasProjectPermission(loginUser, loginEnv, XEyesConfNode.getAppname())) {
+		if (!ifHasProjectPermission(loginUser, loginEnv, xEyesConfNode.getAppname())) {
 			return new ReturnT<String>(500, "您没有该项目的配置权限,请联系管理员开通");
 		}
 
 		// valid group
-		XEyesConfProject group = XEyesConfProjectDao.load(XEyesConfNode.getAppname());
+		XEyesConfProject group = xEyesConfProjectDao.load(xEyesConfNode.getAppname());
 		if (group==null) {
 			return new ReturnT<String>(500, "AppName非法");
 		}
 
 		// valid env
-		if (StringUtils.isBlank(XEyesConfNode.getEnv())) {
+		if (StringUtils.isBlank(xEyesConfNode.getEnv())) {
 			return new ReturnT<String>(500, "配置Env不可为空");
 		}
-		XEyesConfEnv XEyesConfEnv = XEyesConfEnvDao.load(XEyesConfNode.getEnv());
-		if (XEyesConfEnv == null) {
+		XEyesConfEnv xEyesConfEnv = xEyesConfEnvDao.load(xEyesConfNode.getEnv());
+		if (xEyesConfEnv == null) {
 			return new ReturnT<String>(500, "配置Env非法");
 		}
 
 		// valid key
-		if (StringUtils.isBlank(XEyesConfNode.getKey())) {
+		if (StringUtils.isBlank(xEyesConfNode.getKey())) {
 			return new ReturnT<String>(500, "配置Key不可为空");
 		}
-		XEyesConfNode.setKey(XEyesConfNode.getKey().trim());
+		xEyesConfNode.setKey(xEyesConfNode.getKey().trim());
 
-		XEyesConfNode existNode = XEyesConfNodeDao.load(XEyesConfNode.getEnv(), XEyesConfNode.getKey());
+		XEyesConfNode existNode = xEyesConfNodeDao.load(xEyesConfNode.getEnv(), xEyesConfNode.getKey());
 		if (existNode != null) {
 			return new ReturnT<String>(500, "配置Key已存在，不可重复添加");
 		}
-		if (!XEyesConfNode.getKey().startsWith(XEyesConfNode.getAppname())) {
+		if (!xEyesConfNode.getKey().startsWith(xEyesConfNode.getAppname())) {
 			return new ReturnT<String>(500, "配置Key格式非法");
 		}
 
 		// valid title
-		if (StringUtils.isBlank(XEyesConfNode.getTitle())) {
+		if (StringUtils.isBlank(xEyesConfNode.getTitle())) {
 			return new ReturnT<String>(500, "配置描述不可为空");
 		}
 
 		// value force null to ""
-		if (XEyesConfNode.getValue() == null) {
-			XEyesConfNode.setValue("");
+		if (xEyesConfNode.getValue() == null) {
+			xEyesConfNode.setValue("");
 		}
 
 		// add node
 		//xxlConfZKManager.set(xxlConfNode.getEnv(), xxlConfNode.getKey(), xxlConfNode.getValue());
-		XEyesConfNodeDao.insert(XEyesConfNode);
+		xEyesConfNodeDao.insert(xEyesConfNode);
 
 		// node log
 		XEyesConfNodeLog nodeLog = new XEyesConfNodeLog();
-		nodeLog.setEnv(XEyesConfNode.getEnv());
-		nodeLog.setKey(XEyesConfNode.getKey());
-		nodeLog.setTitle(XEyesConfNode.getTitle() + "(配置新增)" );
-		nodeLog.setValue(XEyesConfNode.getValue());
+		nodeLog.setEnv(xEyesConfNode.getEnv());
+		nodeLog.setKey(xEyesConfNode.getKey());
+		nodeLog.setTitle(xEyesConfNode.getTitle() + "(配置新增)" );
+		nodeLog.setValue(xEyesConfNode.getValue());
 		nodeLog.setOptuser(loginUser.getUsername());
-		XEyesConfNodeLogDao.add(nodeLog);
+		xEyesConfNodeLogDao.add(nodeLog);
 
 		// conf msg
-		sendConfMsg(XEyesConfNode.getEnv(), XEyesConfNode.getKey(), XEyesConfNode.getValue());
-
+		sendConfMsg(xEyesConfNode.getEnv(), xEyesConfNode.getKey(), xEyesConfNode.getValue());
 		return ReturnT.SUCCESS;
 	}
 
 	@Override
-	public ReturnT<String> update(XEyesConfNode XEyesConfNode, XEyesConfUser loginUser, String loginEnv) {
+	public ReturnT<String> update(@NotNull XEyesConfNode xEyesConfNode, XEyesConfUser loginUser, String loginEnv) {
 
 		// valid
-		if (StringUtils.isBlank(XEyesConfNode.getKey())) {
+		if (StringUtils.isBlank(xEyesConfNode.getKey())) {
 			return new ReturnT<String>(500, "配置Key不可为空");
 		}
-		XEyesConfNode existNode = XEyesConfNodeDao.load(XEyesConfNode.getEnv(), XEyesConfNode.getKey());
+		XEyesConfNode existNode = xEyesConfNodeDao.load(xEyesConfNode.getEnv(), xEyesConfNode.getKey());
 		if (existNode == null) {
 			return new ReturnT<String>(500, "配置Key非法");
 		}
@@ -231,21 +239,18 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 			return new ReturnT<String>(500, "您没有该项目的配置权限,请联系管理员开通");
 		}
 
-		if (StringUtils.isBlank(XEyesConfNode.getTitle())) {
+		if (StringUtils.isBlank(xEyesConfNode.getTitle())) {
 			return new ReturnT<String>(500, "配置描述不可为空");
 		}
 
 		// value force null to ""
-		if (XEyesConfNode.getValue() == null) {
-			XEyesConfNode.setValue("");
+		if (xEyesConfNode.getValue() == null) {
+			xEyesConfNode.setValue("");
 		}
 
-		// update conf
-		//xxlConfZKManager.set(xxlConfNode.getEnv(), xxlConfNode.getKey(), xxlConfNode.getValue());
-
-		existNode.setTitle(XEyesConfNode.getTitle());
-		existNode.setValue(XEyesConfNode.getValue());
-		int ret = XEyesConfNodeDao.update(existNode);
+		existNode.setTitle(xEyesConfNode.getTitle());
+		existNode.setValue(xEyesConfNode.getValue());
+		int ret = xEyesConfNodeDao.update(existNode);
 		if (ret < 1) {
 			return ReturnT.FAIL;
 		}
@@ -257,76 +262,14 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 		nodeLog.setTitle(existNode.getTitle() + "(配置更新)" );
 		nodeLog.setValue(existNode.getValue());
 		nodeLog.setOptuser(loginUser.getUsername());
-		XEyesConfNodeLogDao.add(nodeLog);
-		XEyesConfNodeLogDao.deleteTimeout(existNode.getEnv(), existNode.getKey(), 10);
+		xEyesConfNodeLogDao.add(nodeLog);
+		xEyesConfNodeLogDao.deleteTimeout(existNode.getEnv(), existNode.getKey(), 10);
 
 		// conf msg
-		sendConfMsg(XEyesConfNode.getEnv(), XEyesConfNode.getKey(), XEyesConfNode.getValue());
+		sendConfMsg(xEyesConfNode.getEnv(), xEyesConfNode.getKey(), xEyesConfNode.getValue());
 
 		return ReturnT.SUCCESS;
 	}
-
-	/*@Override
-	public ReturnT<String> syncConf(String appname, XxlConfUser loginUser, String loginEnv) {
-
-		// valid
-		XxlConfEnv xxlConfEnv = xxlConfEnvDao.load(loginEnv);
-		if (xxlConfEnv == null) {
-			return new ReturnT<String>(500, "配置Env非法");
-		}
-		XxlConfProject group = xxlConfProjectDao.load(appname);
-		if (group==null) {
-			return new ReturnT<String>(500, "AppName非法");
-		}
-
-		// project permission
-		if (!ifHasProjectPermission(loginUser, loginEnv, appname)) {
-			return new ReturnT<String>(500, "您没有该项目的配置权限,请联系管理员开通");
-		}
-
-		List<XxlConfNode> confNodeList = xxlConfNodeDao.pageList(0, 10000, loginEnv, appname, null);
-		if (CollectionUtils.isEmpty(confNodeList)) {
-			return new ReturnT<String>(500, "操作失败，该项目下不存在配置项");
-		}
-
-		// un sync node
-		List<XxlConfNode> unSyncConfNodeList = new ArrayList<>();
-		for (XxlConfNode node: confNodeList) {
-			String realNodeValue = xxlConfZKManager.get(node.getEnv(), node.getKey());
-			if (!node.getValue().equals(realNodeValue)) {
-				unSyncConfNodeList.add(node);
-			}
-		}
-
-		if (CollectionUtils.isEmpty(unSyncConfNodeList)) {
-			return new ReturnT<String>(500, "操作失败，该项目下不存未同步的配置项");
-		}
-
-		// do sync
-		String logContent = "操作成功，共计同步 " + unSyncConfNodeList.size() + " 条配置：";
-		for (XxlConfNode node: unSyncConfNodeList) {
-
-			xxlConfZKManager.set(node.getEnv(), node.getKey(), node.getValue());
-
-			// node log
-			XxlConfNodeLog nodeLog = new XxlConfNodeLog();
-			nodeLog.setEnv(node.getEnv());
-			nodeLog.setKey(node.getKey());
-			nodeLog.setTitle(node.getTitle() + "(全量同步)" );
-			nodeLog.setValue(node.getValue());
-			nodeLog.setOptuser(loginUser.getUsername());
-			xxlConfNodeLogDao.add(nodeLog);
-			xxlConfNodeLogDao.deleteTimeout(node.getEnv(), node.getKey(), 10);
-
-			logContent += "<br>" + node.getKey();
-		}
-		logContent.substring(logContent.length() - 1);
-
-		return new ReturnT<String>(ReturnT.SUCCESS.getCode(), logContent);
-	}*/
-
-
-	// ---------------------- rest api ----------------------
 
 	@Override
 	public ReturnT<Map<String, String>> find(String accessToken, String env, List<String> keys) {
@@ -341,14 +284,6 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 		if (keys==null || keys.size()==0) {
 			return new ReturnT<>(ReturnT.FAIL.getCode(), "keys Invalid.");
 		}
-		/*for (String key: keys) {
-			if (key==null || key.trim().length()<4 || key.trim().length()>100) {
-				return new ReturnT<>(ReturnT.FAIL.getCode(), "Key Invalid[4~100]");
-			}
-			if (!RegexUtil.matches(RegexUtil.abc_number_line_point_pattern, key)) {
-				return new ReturnT<>(ReturnT.FAIL.getCode(), "Key format Invalid");
-			}
-		}*/
 
 		// result
 		Map<String, String> result = new HashMap<String, String>();
@@ -356,10 +291,14 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 
 			// get val
 			String value = null;
-			if (key==null || key.trim().length()<4 || key.trim().length()>100
-					|| !RegexUtil.matches(RegexUtil.abc_number_line_point_pattern, key) ) {
-				// invalid key, pass
-			} else {
+//			if (key == null || key.trim().length() < 4 || key.trim().length() > 100
+//					|| !RegexUtil.matches(RegexUtil.abc_number_line_point_pattern, key)) {
+//				// invalid key, pass
+//			} else {
+//				value = getFileConfData(env, key);
+//			}
+			if (key !=null && key.trim().length() >= 4 && key.trim().length() <= 100
+					&& RegexUtil.matches(RegexUtil.abc_number_line_point_pattern, key) ) {
 				value = getFileConfData(env, key);
 			}
 
@@ -371,7 +310,6 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 			// put
 			result.put(key, value);
 		}
-
 		return new ReturnT<Map<String, String>>(result);
 	}
 
@@ -394,21 +332,9 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 			deferredResult.setResult(new ReturnT<>(ReturnT.FAIL.getCode(), "keys Invalid."));
 			return deferredResult;
 		}
-		/*for (String key: keys) {
-			if (key==null || key.trim().length()<4 || key.trim().length()>100) {
-				deferredResult.setResult(new ReturnT<>(ReturnT.FAIL.getCode(), "Key Invalid[4~100]"));
-				return deferredResult;
-			}
-			if (!RegexUtil.matches(RegexUtil.abc_number_line_point_pattern, key)) {
-				deferredResult.setResult(new ReturnT<>(ReturnT.FAIL.getCode(), "Key format Invalid"));
-				return deferredResult;
-			}
-		}*/
 
 		// monitor by client
 		for (String key: keys) {
-
-
 			// invalid key, pass
 			if (key==null || key.trim().length()<4 || key.trim().length()>100
 					|| !RegexUtil.matches(RegexUtil.abc_number_line_point_pattern, key) ) {
@@ -418,20 +344,13 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 			// monitor each key
 			String fileName = parseConfDataFileName(env, key);
 
-			List<DeferredResult> deferredResultList = confDeferredResultMap.get(fileName);
-			if (deferredResultList == null) {
-				deferredResultList = new ArrayList<>();
-				confDeferredResultMap.put(fileName, deferredResultList);
-			}
+			List<DeferredResult> deferredResultList = confDeferredResultMap.computeIfAbsent(fileName, k -> new ArrayList<>());
 
 			deferredResultList.add(deferredResult);
 		}
 
 		return deferredResult;
 	}
-
-
-	// ---------------------- start stop ----------------------
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -444,17 +363,13 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 	}
 
 
-	// ---------------------- thread ----------------------
-
 	private ExecutorService executorService = Executors.newCachedThreadPool();
 	private volatile boolean executorStoped = false;
 
 	private volatile List<Integer> readedMessageIds = Collections.synchronizedList(new ArrayList<Integer>());
-
 	private Map<String, List<DeferredResult>> confDeferredResultMap = new ConcurrentHashMap<>();
 
 	public void startThead() throws Exception {
-
 		/**
 		 * brocast conf-data msg, sync to file, for "add、update、delete"
 		 */
@@ -464,12 +379,10 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 				while (!executorStoped) {
 					try {
 						// new message, filter readed
-						List<XEyesConfNodeMsg> messageList = XEyesConfNodeMsgDao.findMsg(readedMessageIds);
+						List<XEyesConfNodeMsg> messageList = xEyesConfNodeMsgDao.findMsg(readedMessageIds);
 						if (messageList!=null && messageList.size()>0) {
 							for (XEyesConfNodeMsg message: messageList) {
 								readedMessageIds.add(message.getId());
-
-
 								// sync file
 								setFileConfData(message.getEnv(), message.getKey(), message.getValue());
 							}
@@ -477,7 +390,7 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 
 						// clean old message;
 						if ( (System.currentTimeMillis()/1000) % confBeatTime ==0) {
-							XEyesConfNodeMsgDao.cleanMessage(confBeatTime);
+							xEyesConfNodeMsgDao.cleanMessage(confBeatTime);
 							readedMessageIds.clear();
 						}
 					} catch (Exception e) {
@@ -506,7 +419,6 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 			@Override
 			public void run() {
 				while (!executorStoped) {
-
 					// align to beattime
 					try {
 						long sleepSecond = confBeatTime - (System.currentTimeMillis()/1000)%confBeatTime;
@@ -520,32 +432,25 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 					}
 
 					try {
-
 						// sync registry-data, db + file
 						int offset = 0;
 						int pagesize = 1000;
 						List<String> confDataFileList = new ArrayList<>();
 
-						List<XEyesConfNode> confNodeList = XEyesConfNodeDao.pageList(offset, pagesize, null, null, null);
+						List<XEyesConfNode> confNodeList = xEyesConfNodeDao.pageList(offset, pagesize, null, null, null);
 						while (confNodeList!=null && confNodeList.size()>0) {
-
 							for (XEyesConfNode confNoteItem: confNodeList) {
-
 								// sync file
 								String confDataFile = setFileConfData(confNoteItem.getEnv(), confNoteItem.getKey(), confNoteItem.getValue());
-
 								// collect confDataFile
 								confDataFileList.add(confDataFile);
 							}
-
-
 							offset += 1000;
-							confNodeList = XEyesConfNodeDao.pageList(offset, pagesize, null, null, null);
+							confNodeList = xEyesConfNodeDao.pageList(offset, pagesize, null, null, null);
 						}
 
 						// clean old registry-data file
 						cleanFileConfData(confDataFileList);
-
                         logger.debug("xeyes-conf, sync total conf data success, sync conf count = {}", confDataFileList.size());
 					} catch (Exception e) {
 						if (!executorStoped) {
@@ -562,18 +467,12 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 				}
 			}
 		});
-
-
-
 	}
 
 	private void stopThread(){
 		executorStoped = true;
 		executorService.shutdownNow();
 	}
-
-
-	// ---------------------- file opt ----------------------
 
 	// get
 	public String getFileConfData(String env, String key){
@@ -636,16 +535,20 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 		return new File(confFileName).getPath();
 	}
 
-	// clean
+	/**
+	 * Clean
+	 * @param confDataFileList
+	 */
 	public void cleanFileConfData(List<String> confDataFileList){
 		filterChildPath(new File(confDataFilePath), confDataFileList);
 	}
 
-	public void filterChildPath(File parentPath, final List<String> confDataFileList){
-		if (!parentPath.exists() || parentPath.list()==null || parentPath.list().length==0) {
+	public void filterChildPath(@org.jetbrains.annotations.NotNull File parentPath, final List<String> confDataFileList){
+		if (!parentPath.exists() || parentPath.list()==null || Objects.requireNonNull(parentPath.list()).length==0) {
 			return;
 		}
 		File[] childFileList = parentPath.listFiles();
+		assert childFileList != null;
 		for (File childFile: childFileList) {
 			if (childFile.isFile() && !confDataFileList.contains(childFile.getPath())) {
 				childFile.delete();
@@ -653,15 +556,13 @@ public class XEyesConfNodeServiceImpl implements IXEyesConfNodeService, Initiali
 				logger.info("xeyes-conf, cleanFileConfData, ConfDataFile={}", childFile.getPath());
 			}
 			if (childFile.isDirectory()) {
-				if (parentPath.listFiles()!=null && parentPath.listFiles().length>0) {
+				if (parentPath.listFiles()!=null && Objects.requireNonNull(parentPath.listFiles()).length>0) {
 					filterChildPath(childFile, confDataFileList);
 				} else {
 					childFile.delete();
 				}
-
 			}
 		}
-
 	}
 
 }

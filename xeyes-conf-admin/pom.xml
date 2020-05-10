@@ -25,7 +25,6 @@
 	</properties>
 
 	<dependencies>
-
 		<!-- starter-web：spring-webmvc + autoconfigure + logback + yaml + tomcat -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -79,8 +78,14 @@
 			<scope>provided</scope>
 			<optional>true</optional>
 		</dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>18.0.0</version>
+            <scope>compile</scope>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
 	<build>
 		<plugins>

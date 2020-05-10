@@ -4,18 +4,22 @@ import java.util.List;
 
 /**
  * 配置节点
+ * @author Netfish
  */
 public class XEyesConfNode {
 
 	private String env;
-	private String key;			// 配置Key
-	private String appname; 	// 所属项目AppName
-	private String title; 		// 配置描述
-	private String value;		// 配置Value
+	// 配置Key
+	private String key;
+	// 所属项目AppName
+	private String appname;
+	// 配置描述
+	private String title;
+	// 配置Value
+	private String value;
 
-	// plugin
-	/*private String zkValue; 				// ZK中配置Value	// TODO, delete*/
-	private List<XEyesConfNodeLog> logList;	// 配置变更Log
+	// 配置变更Log
+	private List<XEyesConfNodeLog> logList;
 
 	public String getEnv() {
 		return env;
@@ -56,14 +60,6 @@ public class XEyesConfNode {
 	public void setValue(String value) {
 		this.value = value;
 	}
-
-	/*public String getZkValue() {
-		return zkValue;
-	}
-
-	public void setZkValue(String zkValue) {
-		this.zkValue = zkValue;
-	}*/
 
 	public List<XEyesConfNodeLog> getLogList() {
 		return logList;

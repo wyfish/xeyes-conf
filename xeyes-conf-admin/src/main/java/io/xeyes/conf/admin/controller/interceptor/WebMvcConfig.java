@@ -2,16 +2,17 @@ package io.xeyes.conf.admin.controller.interceptor;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.Resource;
 
 /**
  * web mvc config
  *
+ * @author Netfish
  */
 @Configuration
-public class WebMvcConfig extends WebMvcConfigurerAdapter {
+public class WebMvcConfig implements WebMvcConfigurer {
 
     @Resource
     private PermissionInterceptor permissionInterceptor;
@@ -25,7 +26,6 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         registry.addInterceptor(permissionInterceptor).addPathPatterns("/**");
         registry.addInterceptor(envInterceptor).addPathPatterns("/**");
         registry.addInterceptor(cookieInterceptor).addPathPatterns("/**");
-        super.addInterceptors(registry);
     }
 
 }

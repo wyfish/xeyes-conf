@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
 /**
  * XEyes 配置中心注解
  *
+ * @author Netfish
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)

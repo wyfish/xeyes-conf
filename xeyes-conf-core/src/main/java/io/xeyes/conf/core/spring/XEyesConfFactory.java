@@ -39,9 +39,6 @@ public class XEyesConfFactory extends InstantiationAwareBeanPostProcessorAdapter
 
 	private static Logger logger = LoggerFactory.getLogger(XEyesConfFactory.class);
 
-	// like "xeyes-conf.properties" or "file:/data/webapps/xeyes-conf.properties", include the following env config
-	private String envProp;
-
 	private String adminAddress;
 	private String env;
 	private String accessToken;
@@ -65,10 +62,11 @@ public class XEyesConfFactory extends InstantiationAwareBeanPostProcessorAdapter
 
 
 	/**
-	 * 重写方法
+	 * 重写方法，初始化完成之后调用
 	 */
 	@Override
 	public void afterPropertiesSet() {
+		// 在工厂Bean初始化完成后，调用XEyesConfBaseFactory的初始化方法
 		XEyesConfBaseFactory.init(adminAddress, env, accessToken, mirrorFile);
 	}
 
@@ -77,12 +75,12 @@ public class XEyesConfFactory extends InstantiationAwareBeanPostProcessorAdapter
 	 */
 	@Override
 	public void destroy() {
+		// 析构时调用基类工厂的释放方法
 		XEyesConfBaseFactory.destroy();
 	}
 
-
 	/**
-	 * 重写方法
+	 * 重写方法，实例化完成之后调用
 	 * @param bean
 	 * @param beanName
 	 * @return
@@ -111,7 +109,6 @@ public class XEyesConfFactory extends InstantiationAwareBeanPostProcessorAdapter
 						if ( xEyesConf.callback()) {
 							BeanRefreshXEyesConfListener.addBeanField(confKey, beanField);
 						}
-
 					}
 				}
 			});
@@ -121,7 +118,7 @@ public class XEyesConfFactory extends InstantiationAwareBeanPostProcessorAdapter
 	}
 
 	/**
-	 * 重写方法
+	 * 重写方法，实例化完成之后，初始化完成之前，用于修改属性
 	 * @param pvs
 	 * @param pds
 	 * @param bean
@@ -139,16 +136,14 @@ public class XEyesConfFactory extends InstantiationAwareBeanPostProcessorAdapter
 				if (pv.getValue() instanceof TypedStringValue) {
 					String propertyName = pv.getName();
 					String typeStringVal = ((TypedStringValue) pv.getValue()).getValue();
+					assert typeStringVal != null;
 					if (xmlKeyValid(typeStringVal)) {
-
 						// object + property
 						String confKey = xmlKeyParse(typeStringVal);
 						String confValue = XEyesConfClient.get(confKey, "");
-
 						// resolves placeholders
 						BeanRefreshXEyesConfListener.BeanField beanField = new BeanRefreshXEyesConfListener.BeanField(beanName, propertyName);
 						//refreshBeanField(beanField, confValue, bean);
-
 						Class propClass = String.class;
 						for (PropertyDescriptor item: pds) {
 							if (beanField.getProperty().equals(item.getName())) {
@@ -157,14 +152,11 @@ public class XEyesConfFactory extends InstantiationAwareBeanPostProcessorAdapter
 						}
 						Object valueObj = FieldReflectionUtil.parseValue(propClass, confValue);
 						pv.setConvertedValue(valueObj);
-
 						// watch
 						BeanRefreshXEyesConfListener.addBeanField(confKey, beanField);
-
 					}
 				}
 			}
-
 		}
 
 		return super.postProcessPropertyValues(pvs, pds, bean, beanName);
@@ -190,7 +182,7 @@ public class XEyesConfFactory extends InstantiationAwareBeanPostProcessorAdapter
 		// property descriptor
 		PropertyDescriptor propertyDescriptor = null;
 		PropertyDescriptor[] propertyDescriptors = beanWrapper.getPropertyDescriptors();
-		if (propertyDescriptors!=null && propertyDescriptors.length>0) {
+		if (propertyDescriptors.length > 0) {
 			for (PropertyDescriptor item: propertyDescriptors) {
 				if (beanField.getProperty().equals(item.getName())) {
 					propertyDescriptor = item;
@@ -200,7 +192,8 @@ public class XEyesConfFactory extends InstantiationAwareBeanPostProcessorAdapter
 
 		// refresh field: set or field
 		if (propertyDescriptor!=null && propertyDescriptor.getWriteMethod() != null) {
-			beanWrapper.setPropertyValue(beanField.getProperty(), value);	// support mult data types
+			// support mult data types
+			beanWrapper.setPropertyValue(beanField.getProperty(), value);
 			logger.info("xeyes-conf, refreshBeanField[set] success, {}#{}:{}",
 					beanField.getBeanName(), beanField.getProperty(), value);
 		} else {
@@ -214,7 +207,7 @@ public class XEyesConfFactory extends InstantiationAwareBeanPostProcessorAdapter
 							Object valueObj = FieldReflectionUtil.parseValue(fieldItem.getType(), value);
 
 							fieldItem.setAccessible(true);
-							fieldItem.set(finalBean, valueObj);		// support mult data types
+							fieldItem.set(finalBean, valueObj);		// support multi data types
 
 							logger.info(">>>>>>>>>>> xxl-conf, refreshBeanField[field] success, {}#{}:{}",
 									beanField.getBeanName(), beanField.getProperty(), value);
@@ -242,15 +235,16 @@ public class XEyesConfFactory extends InstantiationAwareBeanPostProcessorAdapter
 		if (beanName == null) {
 			beanName = beanClass.getName();
 		}
-
-		if (registry.containsBeanDefinition(beanName)) {	// avoid beanName repeat
+		// avoid beanName repeat
+		if (registry.containsBeanDefinition(beanName)) {
 			return false;
 		}
 
 		String[] beanNameArr = registry.getBeanDefinitionNames();
 		for (String beanNameItem : beanNameArr) {
 			BeanDefinition beanDefinition = registry.getBeanDefinition(beanNameItem);
-			if (Objects.equals(beanDefinition.getBeanClassName(), beanClass.getName())) {	// avoid className repeat
+			// avoid className repeat
+			if (Objects.equals(beanDefinition.getBeanClassName(), beanClass.getName())) {
 				return false;
 			}
 		}
@@ -273,10 +267,7 @@ public class XEyesConfFactory extends InstantiationAwareBeanPostProcessorAdapter
 	private static boolean xmlKeyValid(String originKey){
 		boolean start = originKey.startsWith(placeholderPrefix);
 		boolean end = originKey.endsWith(placeholderSuffix);
-		if (start && end) {
-			return true;
-		}
-		return false;
+		return start && end;
 	}
 
 	/**
@@ -304,7 +295,7 @@ public class XEyesConfFactory extends InstantiationAwareBeanPostProcessorAdapter
 	private static BeanFactory beanFactory;
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-		this.beanFactory = beanFactory;
+		XEyesConfFactory.beanFactory = beanFactory;
 	}
 
 }
